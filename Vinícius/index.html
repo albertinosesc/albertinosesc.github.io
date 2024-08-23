@@ -1,0 +1,614 @@
+<html><head><base href="https://music.education/interactive-notation/" />
+<title>NBM - Escola</title>
+<style>
+    body {
+        font-family: 'Comic Sans MS', cursive, sans-serif;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        background-color: #FFD700;
+        background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><text x="50" y="50" font-size="80" text-anchor="middle" dy=".35em" fill="rgba(255,255,255,0.1)">♫</text></svg>');
+    }
+    #chalkboard {
+        width: 90%;
+        height: 300px;
+        background-color: #28a745;
+        border: 20px solid #8B4513;
+        border-radius: 20px;
+        padding: 20px;
+        margin-bottom: 20px;
+        overflow-y: auto;
+        box-shadow: 0 10px 20px rgba(0,0,0,0.19), 0 6px 6px rgba(0,0,0,0.23);
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    .chalkboard-line {
+        width: 100%;
+        display: flex;
+        flex-wrap: wrap;
+        margin-bottom: 20px; /* Increased space between lines */
+    }
+    #input {
+        width: 90%;
+        height: 100px;
+        font-size: 24px;
+        margin-bottom: 20px;
+        padding: 10px;
+        border: 5px solid #FF69B4;
+        border-radius: 15px;
+        background-color: #FFF5EE;
+    }
+    .controls {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 15px;
+        margin-bottom: 20px;
+    }
+    button, select {
+        font-size: 24px;
+        padding: 15px 30px;
+        cursor: pointer;
+        background-color: #FF69B4;
+        border: none;
+        border-radius: 50px;
+        color: white;
+        transition: all 0.3s ease;
+        box-shadow: 0 5px #FF1493;
+    }
+    button:hover, select:hover {
+        background-color: #FF1493;
+        transform: translateY(-3px);
+        box-shadow: 0 8px #C71585;
+    }
+    button:active, select:active {
+        transform: translateY(2px);
+        box-shadow: 0 3px #C71585;
+    }
+    .slider {
+        width: 250px;
+        -webkit-appearance: none;
+        height: 25px;
+        background: #FFA07A;
+        outline: none;
+        border-radius: 15px;
+    }
+    .slider::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        appearance: none;
+        width: 35px;
+        height: 35px;
+        background: #FF4500;
+        cursor: pointer;
+        border-radius: 50%;
+    }
+    .slider::-moz-range-thumb {
+        width: 35px;
+        height: 35px;
+        background: #FF4500;
+        cursor: pointer;
+        border-radius: 50%;
+    }
+    #midiFileInput {
+        margin-bottom: 20px;
+        font-size: 18px;
+    }
+    #noteNames {
+        font-size: 24px;
+        margin-bottom: 20px;
+        background-color: #FFF5EE;
+        padding: 10px;
+        border-radius: 10px;
+        border: 3px solid #FF69B4;
+    }
+    .midi-controls {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        margin-top: 20px;
+    }
+    h1 {
+        font-size: 48px;
+        color: #FF1493;
+        text-shadow: 3px 3px #FFB6C1;
+        margin-bottom: 30px;
+    }
+    .circle {
+        display: inline-block;
+        border-radius: 50%;
+        margin: 0 5px;
+    }
+    #songLibrary {
+        width: 90%;
+        max-width: 600px;
+        background-color: #FFF5EE;
+        border: 5px solid #FF69B4;
+        border-radius: 15px;
+        padding: 20px;
+        margin-bottom: 20px;
+    }
+    #songList {
+        list-style-type: none;
+        padding: 0;
+    }
+    #songList li {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px;
+        margin: 5px 0;
+        background-color: #FFB6C1;
+        border-radius: 10px;
+        transition: background-color 0.3s ease;
+    }
+    #songList li:hover {
+        background-color: #FF69B4;
+    }
+    #saveSongBtn {
+        margin-top: 10px;
+    }
+    .song-actions {
+        display: flex;
+        gap: 10px;
+    }
+    .delete-btn {
+        background-color: #ff4d4d;
+        color: white;
+        border: none;
+        padding: 5px 10px;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+    }
+    .delete-btn:hover {
+        background-color: #ff1a1a;
+    }
+    .load-btn {
+        background-color: #4CAF50;
+        color: white;
+        border: none;
+        padding: 5px 10px;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+    }
+    .load-btn:hover {
+        background-color: #45a049;
+    }
+    h3{
+        color: #06525f; 
+    }
+</style>
+</head>
+<body>
+<h1>🎵 Quadro Musical 🎵</h1>
+<div id="chalkboard"></div>
+<textarea id="input" placeholder="Digite "></textarea>
+<div class="controls">
+    <button id="playBtn">▶️ Tocar</button>
+    <button id="pauseBtn">⏸️ Pausa</button>
+    <button id="stopBtn">⏹️ Parar</button>
+    <button id="loopBtn">🔁 Loop: Off</button>
+    <button id="toggleNoteNamesBtn">🎼 Mostrar Notas</button>
+    <select id="displayMode">
+        <option value="numbers">Números</option>
+        <option value="circles">Círculos</option>
+        <option value="letters">Letras (C, D, E...)</option>
+        <option value="solfege">Nomes (Do, Re, Mi...)</option>
+    </select>
+</div>
+<div class="controls">
+    <label for="tempo">🏃‍♂️ Tempo: <span id="tempoValue">120</span> BPM</label>
+    <input type="range" id="tempo" class="slider" min="60" max="240" value="120">
+</div>
+<div class="controls">
+    <label for="volume">🔊 Volume: <span id="volumeValue">100</span>%</label>
+    <input type="range" id="volume" class="slider" min="0" max="100" value="100">
+</div>
+<div class="controls">
+    <label for="fontSize">📏 Font Size: <span id="fontSizeValue">72</span>px</label>
+    <input type="range" id="fontSize" class="slider" min="24" max="120" value="72">
+</div>
+<div class="controls">
+    <label for="circleSize">⚪ Circle Size: <span id="circleSizeValue">50</span>px</label>
+    <input type="range" id="circleSize" class="slider" min="20" max="100" value="50">
+</div>
+<div class="controls">
+    <input type="file" id="midiFileInput" accept=".mid,.midi">
+    <button id="toggleMidiBtn">🎹 MIDI: Off</button>
+</div>
+<div class="midi-controls">
+    <button id="playMidiBtn">▶️ Play MIDI</button>
+    <div class="controls">
+        <label for="midiVolume">🎹 MIDI Volume: <span id="midiVolumeValue">100</span>%</label>
+        <input type="range" id="midiVolume" class="slider" min="0" max="100" value="100">
+    </div>
+</div>
+<div id="noteNames"></div>
+
+<div id="songLibrary">
+    <h2>🎶 Biblioteca</h2>
+    <ul id="songList"></ul>
+    <input type="text" id="newSongName" placeholder="Título da Música">
+    <button id="saveSongBtn">💾 Salvar</button>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js"></script>
+<script src="https://unpkg.com/@tonejs/midi"></script>
+<script>
+    const chalkboard = document.getElementById('chalkboard');
+    const input = document.getElementById('input');
+    const playBtn = document.getElementById('playBtn');
+    const pauseBtn = document.getElementById('pauseBtn');
+    const stopBtn = document.getElementById('stopBtn');
+    const loopBtn = document.getElementById('loopBtn');
+    const tempoSlider = document.getElementById('tempo');
+    const tempoValue = document.getElementById('tempoValue');
+    const volumeSlider = document.getElementById('volume');
+    const volumeValue = document.getElementById('volumeValue');
+    const fontSizeSlider = document.getElementById('fontSize');
+    const fontSizeValue = document.getElementById('fontSizeValue');
+    const circleSizeSlider = document.getElementById('circleSize');
+    const circleSizeValue = document.getElementById('circleSizeValue');
+    const midiFileInput = document.getElementById('midiFileInput');
+    const toggleMidiBtn = document.getElementById('toggleMidiBtn');
+    const toggleNoteNamesBtn = document.getElementById('toggleNoteNamesBtn');
+    const noteNamesDiv = document.getElementById('noteNames');
+    const playMidiBtn = document.getElementById('playMidiBtn');
+    const midiVolumeSlider = document.getElementById('midiVolume');
+    const midiVolumeValue = document.getElementById('midiVolumeValue');
+    const displayModeSelect = document.getElementById('displayMode');
+    const songList = document.getElementById('songList');
+    const newSongName = document.getElementById('newSongName');
+    const saveSongBtn = document.getElementById('saveSongBtn');
+
+    let isPlaying = false;
+    let isLooping = false;
+    let isMidiActive = false;
+    let currentIndex = 0;
+    let sequence = [];
+
+    const noteMap = {
+        '1': 'Do', '2': 'Re', '3': 'Mi', '4': 'Fa', '5': 'Sol', '6': 'La', '7': 'Si',
+        'x': 'Rest', '-': 'Rest'
+    };
+
+    const colorMap = {
+        '1': '#FF0000', '2': '#FFA500', '3': '#FFFF00', '4': '#00FF00',
+        '5': '#0000FF', '6': '#4B0082', '7': '#EE82EE', 'x': '#000000', '-': '#000000'
+    };
+
+    const letterMap = {
+        '1': 'C', '2': 'D', '3': 'E', '4': 'F', '5': 'G', '6': 'A', '7': 'B',
+        'x': 'x', '-': 'x'
+    };
+
+    const synth = new Tone.Synth({
+        oscillator: { type: 'triangle' },
+        envelope: { attack: 0.05, decay: 0.1, sustain: 0.3, release: 0.5 }
+    }).toDestination();
+    let midiPart = null;
+
+    function parseInput(text) {
+        const regex = /(\d['',]*(?:\/+)?\.?|-|x)/g;
+        return text.match(regex) || [];
+    }
+
+    function updateChalkboard() {
+        const numbers = parseInput(input.value);
+        const displayMode = displayModeSelect.value;
+        const circleSize = circleSizeSlider.value;
+        const fontSize = fontSizeSlider.value;
+        
+        chalkboard.innerHTML = '';
+        let currentLine = document.createElement('div');
+        currentLine.className = 'chalkboard-line';
+        chalkboard.appendChild(currentLine);
+
+        numbers.forEach(num => {
+            const baseNum = num.charAt(0);
+            const color = colorMap[baseNum] || '#000000';
+            let content;
+
+            switch (displayMode) {
+                case 'circles':
+                    if (baseNum === 'x' || baseNum === '-') {
+                        content = 'x';
+                    } else {
+                        content = `<span class="circle" style="background-color: ${color}; width: ${circleSize}px; height: ${circleSize}px;"></span>`;
+                    }
+                    break;
+                case 'letters':
+                    content = `<span style="color: ${color};">${letterMap[baseNum] || baseNum}</span>`;
+                    break;
+                case 'solfege':
+                    content = `<span style="color: ${color};">${noteMap[baseNum] || baseNum}</span>`;
+                    break;
+                default:
+                    content = `<span style="color: ${color};">${num}</span>`;
+            }
+
+            const span = document.createElement('span');
+            span.innerHTML = content;
+            span.style.fontSize = `${fontSize}px`;
+            span.style.marginRight = '10px';
+
+            if (currentLine.offsetWidth + span.offsetWidth > chalkboard.offsetWidth - 40) {
+                currentLine = document.createElement('div');
+                currentLine.className = 'chalkboard-line';
+                chalkboard.appendChild(currentLine);
+            }
+
+            currentLine.appendChild(span);
+        });
+    }
+
+    function updateNoteNames() {
+        const numbers = parseInput(input.value);
+        noteNamesDiv.innerHTML = numbers.map(num => {
+            const baseNum = num.charAt(0);
+            const noteName = noteMap[baseNum] || '';
+            return noteName ? `<span style="color: ${colorMap[baseNum]};">${noteName}</span>` : 'Rest';
+        }).join(' ');
+    }
+
+    input.addEventListener('input', () => {
+        updateChalkboard();
+        updateNoteNames();
+    });
+
+    displayModeSelect.addEventListener('change', updateChalkboard);
+
+    circleSizeSlider.addEventListener('input', () => {
+        const circleSize = circleSizeSlider.value;
+        circleSizeValue.textContent = circleSize;
+        updateChalkboard();
+    });
+
+    function getNoteFrequency(note, octave) {
+        const baseFreq = {
+            'Do': 261.63, 'Re': 293.66, 'Mi': 329.63, 'Fa': 349.23,
+            'Sol': 392.00, 'La': 440.00, 'Si': 493.88
+        };
+        return baseFreq[note] * Math.pow(2, octave - 4);
+    }
+
+    function playNote(num) {
+        const baseNum = num.charAt(0);
+        if (baseNum === 'x' || baseNum === '-') {
+            return new Promise(resolve => setTimeout(resolve, Tone.Time('4n').toSeconds() * 1000));
+        }
+
+        const note = noteMap[baseNum];
+        let octave = 4;
+        if (num.includes("''")) octave = 6;
+        else if (num.includes("'")) octave = 5;
+        else if (num.includes(",")) octave = num.split(',').length === 2 ? 3 : 2;
+
+        let duration = '4n';
+        if (num.includes('//')) duration = '16n';
+        else if (num.includes('/')) duration = '8n';
+        if (num.includes('.')) duration += '.';
+
+        const freq = getNoteFrequency(note, octave);
+        synth.triggerAttackRelease(freq, duration);
+
+        return new Promise(resolve => setTimeout(resolve, Tone.Time(duration).toSeconds() * 1000));
+    }
+
+    async function playSequence() {
+        if (!isPlaying) return;
+        if (currentIndex >= sequence.length) {
+            if (isLooping) {
+                currentIndex = 0;
+            } else {
+                isPlaying = false;
+                return;
+            }
+        }
+        await playNote(sequence[currentIndex]);
+        currentIndex++;
+        playSequence();
+    }
+
+    playBtn.addEventListener('click', () => {
+        if (!isPlaying) {
+            sequence = parseInput(input.value);
+            currentIndex = 0;
+            isPlaying = true;
+            Tone.start();
+            playSequence();
+            if (isMidiActive && midiPart) {
+                Tone.Transport.start();
+            }
+        }
+    });
+
+    pauseBtn.addEventListener('click', () => {
+        isPlaying = false;
+        Tone.Transport.pause();
+    });
+
+    stopBtn.addEventListener('click', () => {
+        isPlaying = false;
+        currentIndex = 0;
+        Tone.Transport.stop();
+    });
+
+    loopBtn.addEventListener('click', () => {
+        isLooping = !isLooping;
+        loopBtn.textContent = `🔁 Loop: ${isLooping ? 'On' : 'Off'}`;
+        if (midiPart) {
+            midiPart.loop = isLooping;
+        }
+    });
+
+    tempoSlider.addEventListener('input', () => {
+        const tempo = tempoSlider.value;
+        tempoValue.textContent = tempo;
+        Tone.Transport.bpm.value = tempo;
+    });
+
+    volumeSlider.addEventListener('input', () => {
+        const volume = volumeSlider.value;
+        volumeValue.textContent = volume;
+        synth.volume.value = Tone.gainToDb(volume / 100);
+    });
+
+    fontSizeSlider.addEventListener('input', () => {
+        const fontSize = fontSizeSlider.value;
+        fontSizeValue.textContent = fontSize;
+        updateChalkboard();
+    });
+
+    toggleNoteNamesBtn.addEventListener('click', () => {
+        noteNamesDiv.style.display = noteNamesDiv.style.display === 'none' ? 'block' : 'none';
+    });
+
+    midiFileInput.addEventListener('change', (event) => {
+        const file = event.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = async (e) => {
+                const midiData = new Uint8Array(e.target.result);
+                const midi = new Midi(midiData);
+                
+                if (midiPart) {
+                    midiPart.dispose();
+                }
+
+                const synths = [];
+                midi.tracks.forEach((track) => {
+                    const synth = new Tone.PolySynth(Tone.Synth, {
+                        oscillator: { type: 'triangle' },
+                        envelope: { attack: 0.02, decay: 0.1, sustain: 0.3, release: 1 }
+                    }).toDestination();
+                    synths.push(synth);
+                    
+                    const notes = track.notes.map(note => ({
+                        time: note.time,
+                        note: note.name,
+                        duration: note.duration
+                    }));
+                    
+                    const part = new Tone.Part((time, note) => {
+                        synth.triggerAttackRelease(note.note, note.duration, time);
+                    }, notes);
+                    
+                    part.start(0);
+                });
+
+                midiPart = new Tone.Part(() => {}, []);
+                midiPart.loop = isLooping;
+                Tone.Transport.bpm.value = midi.header.tempos[0]?.bpm || 120;
+                tempoSlider.value = Tone.Transport.bpm.value;
+                tempoValue.textContent = Tone.Transport.bpm.value;
+            };
+            reader.readAsArrayBuffer(file);
+        }
+    });
+
+    toggleMidiBtn.addEventListener('click', () => {
+        isMidiActive = !isMidiActive;
+        toggleMidiBtn.textContent = `🎹 MIDI: ${isMidiActive ? 'On' : 'Off'}`;
+        if (isMidiActive && isPlaying && midiPart) {
+            Tone.Transport.start();
+        } else if (!isMidiActive) {
+            Tone.Transport.stop();
+        }
+    });
+
+    playMidiBtn.addEventListener('click', () => {
+        if (midiPart) {
+            if (Tone.Transport.state === 'started') {
+                Tone.Transport.pause();
+                playMidiBtn.textContent = '▶️ Play MIDI';
+            } else {
+                Tone.start();
+                Tone.Transport.start();
+                playMidiBtn.textContent = '⏸️ Pause MIDI';
+            }
+        }
+    });
+
+    midiVolumeSlider.addEventListener('input', () => {
+        const volume = midiVolumeSlider.value;
+        midiVolumeValue.textContent = volume;
+        Tone.Destination.volume.value = Tone.gainToDb(volume / 100);
+    });
+
+    // Song Library Functions
+    function loadSongs() {
+        const songs = JSON.parse(localStorage.getItem('songs')) || {};
+        songList.innerHTML = '';
+        Object.keys(songs).forEach(songName => {
+            const li = document.createElement('li');
+            li.innerHTML = `
+                <span>${songName}</span>
+                <div class="song-actions">
+                    <button class="load-btn">Abrir</button>
+                    <button class="delete-btn">Excluir</button>
+                </div>
+            `;
+            const loadBtn = li.querySelector('.load-btn');
+            const deleteBtn = li.querySelector('.delete-btn');
+            
+            loadBtn.addEventListener('click', () => loadSong(songName));
+            deleteBtn.addEventListener('click', () => deleteSong(songName));
+            
+            songList.appendChild(li);
+        });
+    }
+
+    function loadSong(songName) {
+        const songs = JSON.parse(localStorage.getItem('songs')) || {};
+        if (songs[songName]) {
+            input.value = songs[songName];
+            updateChalkboard();
+            updateNoteNames();
+        }
+    }
+
+    function saveSong() {
+        const songName = newSongName.value.trim();
+        if (songName && input.value) {
+            const songs = JSON.parse(localStorage.getItem('songs')) || {};
+            songs[songName] = input.value;
+            localStorage.setItem('songs', JSON.stringify(songs));
+            loadSongs();
+            newSongName.value = '';
+        } else {
+            alert('Please enter a song name and some notes!');
+        }
+    }
+
+    function deleteSong(songName) {
+        if (confirm(`Are you sure you want to delete "${songName}"?`)) {
+            const songs = JSON.parse(localStorage.getItem('songs')) || {};
+            delete songs[songName];
+            localStorage.setItem('songs', JSON.stringify(songs));
+            loadSongs();
+        }
+    }
+
+    saveSongBtn.addEventListener('click', saveSong);
+
+    // Initial setup
+    updateChalkboard();
+    updateNoteNames();
+
+    // Add example songs
+    const exampleSongs = {
+        "Ode to Joy": "3345543211233.2/2x3345543211232.1/1x223123/4/3123/4/32125x3345543211232.1/1x",
+        "Twinkle Twinkle Little Star": "1 1 5 5 6 6 5 x 4 4 3 3 2 2 1 x 5 5 4 4 3 3 2 x 5 5 4 4 3 3 2 x 1 1 5 5 6 6 5 x 4 4 3 3 2 2 1 x"
+    };
+
+    const songs = JSON.parse(localStorage.getItem('songs')) || {};
+    Object.assign(songs, exampleSongs);
+    localStorage.setItem('songs', JSON.stringify(songs));
+    loadSongs();
+</script>
+</body>
+<h3>NBM - Escola de Música / 2024 </h3>
+</html>
