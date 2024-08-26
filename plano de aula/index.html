@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<link rel="stylesheet" href="styles1.css">
+</head>
+<body>
+	<div class="container">
+		<form method="post" action="" name="contact-form">
+			<h4>NBM - Formulário de Ação</h4>
+			<input type="text" name="codigo" placeholder="Código">
+			<input type="date" name="data" placeholder="Data">
+			<input type="text" name="tipo" placeholder="Tipo">
+			<input type="text" name="tema" placeholder="Tema">
+			<input type="text" name="categoria" placeholder="Categoria">
+			<input type="text" name="seguimento" placeholder="Seguimento">
+			<input type="text" name="turma" placeholder="Turma">
+			<input type="text" name="eixo_tematico" placeholder="Eixo Temático">
+			<input type="text" name="campo_experiencia" placeholder="Campo de Experiência">
+			<textarea name="objetivo_de_aprendizagem_desenvolvimento" rows="7" placeholder="Objetivo de Aprendizagem de Desenvolvimento"></textarea>
+			<textarea name="apresentação" rows="7" placeholder="Apresentação"></textarea>
+			<textarea name="conteudo" rows="7" placeholder="Conteúdo"></textarea>
+			<textarea name="objetivo_geral" rows="7" placeholder="Objetivo Geral"></textarea>
+			<textarea name="objetivo_especificos " rows="7" placeholder="Objetivos Específicos"></textarea>
+			<textarea name="objetivo_aluno" rows="7" placeholder="Objetivo do Aluno"></textarea>
+			<textarea name="perspectiva_aprendizagem" rows="7" placeholder="Perspectiva da Aprendizagem"></textarea>
+			<textarea name="conteudo_procedimental" rows="7" placeholder="Conteudo Procedimental"></textarea>
+			<textarea name="conteudo_atitudinal" rows="7" placeholder="Conteudo Atitudinal"></textarea>
+			<textarea name="conteudo_conceitual" rows="7" placeholder="Conteudo Conceitual"></textarea>
+			<h4>Metodologia</h4>
+			<h3>Desenvolvimento da Aula</h3>
+			<textarea name="acolhida " rows="7" placeholder="Momento de Acolhida"></textarea>
+			<textarea name="exploração_conhecimento" rows="7" placeholder="Exploração do Conhecimento"></textarea>
+			<textarea name="atividade_principal" rows="7" placeholder="Atividade Principal"></textarea>
+			<textarea name="momento_fechamento" rows="7" placeholder="Momento de Fechamento"></textarea>
+			<textarea name="recursos_didáticos" rows="7" placeholder="Recursos Didáticos"></textarea>
+			<textarea name="estratégias_ensino" rows="7" placeholder="Estratégias de Ensino"></textarea>
+			<h4>Avaliação</h4>
+			<textarea name="observação_professor" rows="7" placeholder="Observação do Professor"></textarea>
+			<textarea name="autoavaliação" rows="7" placeholder="Autoavaliação"></textarea>
+			<textarea name="coavaliação" rows="7" placeholder="Coavaliação"></textarea>
+			<textarea name="critérios_avaliação" rows="7" placeholder="Critérios de Avaliação"></textarea>
+			<textarea name="instrumentos_avaliação" rows="7" placeholder="Instrumentos de Avaliação"></textarea>
+			<textarea name="tempo_previsto" rows="7" placeholder="Tempo Previsto"></textarea>
+			<textarea name="observações" rows="7" placeholder="Observações"></textarea>
+			<textarea name="referencias" rows="7" placeholder="Referências"></textarea>
+			<textarea name="anexo" rows="7" placeholder="Anexo"></textarea>
+			<textarea name=" codigo_alfanumérico_bncc" rows="7" placeholder="Código Alfanumérico da BNCC"></textarea>
+			<textarea name="observações_finais" rows="7" placeholder="Observações Finais"></textarea>
+			<textarea name="objetivo_professor" rows="7" placeholder="Objetivo do Professor"></textarea>
+			<textarea name="objetivo_aluno" rows="7" placeholder="Objetivo do Aluno"></textarea>
+			<input type="submit" value="Enviar" id="submit">
+            <h4>Último Código</h>
+             <div id="cellValue">Carregando...</div>
+		</form>
+	</div>
+
+	<script src="script.js"></script>
+
+</script>
+
+
+
+
+<script>
+    const url = 'https://script.google.com/macros/s/AKfycbzjkekPgF5QCu36cwjW8XtJx4BrApv_HXXk87FycI3fBCOlI8aE2ZtyGabpDiJgqZuP_Q/exec';
+
+    fetch(url)
+        .then(response => response.json())
+        .then(data => {
+            document.getElementById('cellValue').innerText = data.value;
+        })
+        .catch(error => {
+            console.error('Erro ao carregar o valor:', error);
+        });
+</script>
+</body>
+</html>
