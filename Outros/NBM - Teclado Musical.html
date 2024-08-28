@@ -129,6 +129,11 @@
   #mark-note-btn.active {
     background-color: #f44336;
   }
+    h4{
+  font-style: italic; /* Deixa o texto em itálico */
+  text-decoration: underline; /* Sublinha o texto */
+}
+
 </style>
 </head>
 <body>
@@ -159,126 +164,122 @@
     <button id="mark-note-btn">Marcar Nota</button>
   </div>
   <div id="keyboard-guide">
-    Use as teclas do seu teclado para tocar o piano: A-L (teclas brancas), W-P (teclas pretas)
+    Use as teclas do seu teclado para tocar o piano: Primeira oitava: A-J
+     (teclas brancas), Q-T(teclas pretas), Segunda oitava: Z-M
+     (teclas brancas), Y-P (teclas pretas)
+
+    
   </div>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.min.js"></script>
-<script>
-  const piano = document.getElementById('piano');
-  const volumeControl = document.getElementById('volume');
-  const timbreControl = document.getElementById('timbre');
-  const octaveControl = document.getElementById('octave');
-  const showNotesControl = document.getElementById('show-notes');
-  const markNoteBtn = document.getElementById('mark-note-btn');
-  
-  const notes = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
-  
-  const synth = new Tone.PolySynth(Tone.Synth).toDestination();
-  
-  let baseOctave = 4;
-  let isMarkingNote = false;
-  
-  const keyMap = {
-    'a': 'C', 'w': 'C#', 's': 'D', 'e': 'D#', 'd': 'E', 'f': 'F',
-    't': 'F#', 'g': 'G', 'y': 'G#', 'h': 'A', 'u': 'A#', 'j': 'B',
-    'k': 'C', 'o': 'C#', 'l': 'D', 'p': 'D#', ';': 'E', "'": 'F'
-  };
-
-  const reverseKeyMap = Object.fromEntries(
-    Object.entries(keyMap).map(([key, value]) => [value, key.toUpperCase()])
-  );
-  
-  function createKey(note, octave) {
-    const key = document.createElement('div');
-    key.className = `key${note.includes('#') ? ' black' : ''}`;
-    key.dataset.note = note;
-    key.dataset.octave = octave;
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.min.js"></script>
+  <script>
+    const piano = document.getElementById('piano');
+    const volumeControl = document.getElementById('volume');
+    const timbreControl = document.getElementById('timbre');
+    const octaveControl = document.getElementById('octave');
+    const showNotesControl = document.getElementById('show-notes');
+    const markNoteBtn = document.getElementById('mark-note-btn');
     
-    const noteLabel = document.createElement('div');
-    noteLabel.className = 'note-label';
-    noteLabel.textContent = note;
-    key.appendChild(noteLabel);
+    const notes = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
     
-    const keyLabel = document.createElement('div');
-    keyLabel.className = 'key-label';
-    keyLabel.textContent = reverseKeyMap[note] || '';
-    key.appendChild(keyLabel);
+    const synth = new Tone.PolySynth(Tone.Synth).toDestination();
     
-    key.addEventListener('mousedown', () => playNote(note, octave));
-    key.addEventListener('mouseup', () => stopNote(note, octave));
-    key.addEventListener('mouseleave', () => stopNote(note, octave));
-    key.addEventListener('click', () => toggleMarkNote(key));
+    let baseOctave = 4;
+    let isMarkingNote = false;
     
-    return key;
-  }
+    const keyMap = {
+      'a': 'C', 'q': 'C#', 's': 'D', 'w': 'D#', 'd': 'E', 'f': 'F',
+      'e': 'F#', 'g': 'G', 'r': 'G#', 'h': 'A', 't': 'A#', 'j': 'B',
+      'z': 'C', 'y': 'C#', 'x': 'D', 'u': 'D#', 'c': 'E', 'v': 'F',
+      'i': 'F#', 'b': 'G', 'o': 'G#', 'n': 'A', 'p': 'A#', 'm': 'B',
+      ',': 'C'
+    };
   
-  function rebuildPiano() {
-    piano.innerHTML = '';
-    notes.forEach((note, index) => {
-      piano.appendChild(createKey(note, baseOctave));
-      if (index === notes.length - 1) {
+    function createKey(note, octave) {
+      const key = document.createElement('div');
+      key.className = `key${note.includes('#') ? ' black' : ''}`;
+      key.dataset.note = note;
+      key.dataset.octave = octave;
+      
+      const noteLabel = document.createElement('div');
+      noteLabel.className = 'note-label';
+      noteLabel.textContent = note;
+      key.appendChild(noteLabel);
+      
+      key.addEventListener('mousedown', () => playNote(note, octave));
+      key.addEventListener('mouseup', () => stopNote(note, octave));
+      key.addEventListener('mouseleave', () => stopNote(note, octave));
+      key.addEventListener('click', () => toggleMarkNote(key));
+      
+      return key;
+    }
+    
+    function rebuildPiano() {
+      piano.innerHTML = '';
+      for (let octave = baseOctave; octave <= baseOctave + 1; octave++) {
         notes.forEach(note => {
-          piano.appendChild(createKey(note, baseOctave + 1));
+          piano.appendChild(createKey(note, octave));
         });
       }
-    });
-    updateNoteVisibility();
-  }
-  
-  rebuildPiano();
-  
-  function playNote(note, octave) {
-    const fullNote = `${note}${octave}`;
-    synth.triggerAttack(fullNote);
-    const key = document.querySelector(`[data-note="${note}"][data-octave="${octave}"]`);
-    if (key) key.classList.add('active');
-  }
-  
-  function stopNote(note, octave) {
-    const fullNote = `${note}${octave}`;
-    synth.triggerRelease(fullNote);
-    const key = document.querySelector(`[data-note="${note}"][data-octave="${octave}"]`);
-    if (key) key.classList.remove('active');
-  }
-  
-  volumeControl.addEventListener('input', (e) => {
-    Tone.Destination.volume.value = Tone.gainToDb(parseFloat(e.target.value));
-  });
-  
-  timbreControl.addEventListener('change', (e) => {
-    synth.set({ oscillator: { type: e.target.value } });
-  });
-  
-  octaveControl.addEventListener('change', (e) => {
-    baseOctave = parseInt(e.target.value);
+      updateNoteVisibility();
+    }
+    
     rebuildPiano();
-  });
-  
-  showNotesControl.addEventListener('change', updateNoteVisibility);
-  
-  function updateNoteVisibility() {
-    const showNotes = showNotesControl.checked;
-    document.querySelectorAll('.note-label').forEach(label => {
-      label.style.display = showNotes ? 'block' : 'none';
+    
+    function playNote(note, octave) {
+      const fullNote = `${note}${octave}`;
+      synth.triggerAttack(fullNote);
+      const key = document.querySelector(`[data-note="${note}"][data-octave="${octave}"]`);
+      if (key) key.classList.add('active');
+    }
+    
+    function stopNote(note, octave) {
+      const fullNote = `${note}${octave}`;
+      synth.triggerRelease(fullNote);
+      const key = document.querySelector(`[data-note="${note}"][data-octave="${octave}"]`);
+      if (key) key.classList.remove('active');
+    }
+    
+    volumeControl.addEventListener('input', (e) => {
+      Tone.Destination.volume.value = Tone.gainToDb(parseFloat(e.target.value));
     });
-  }
-  
-  // Keyboard controls
-  document.addEventListener('keydown', (e) => {
-    if (!e.repeat && keyMap[e.key.toLowerCase()]) {
-      const note = keyMap[e.key.toLowerCase()];
-      const octave = ['k', 'o', 'l', 'p', ';', "'"].includes(e.key.toLowerCase()) ? baseOctave + 1 : baseOctave;
-      playNote(note, octave);
+    
+    timbreControl.addEventListener('change', (e) => {
+      synth.set({ oscillator: { type: e.target.value } });
+    });
+    
+    octaveControl.addEventListener('change', (e) => {
+      baseOctave = parseInt(e.target.value);
+      rebuildPiano();
+    });
+    
+    showNotesControl.addEventListener('change', updateNoteVisibility);
+    
+    function updateNoteVisibility() {
+      const showNotes = showNotesControl.checked;
+      document.querySelectorAll('.note-label').forEach(label => {
+        label.style.display = showNotes ? 'block' : 'none';
+      });
     }
-  });
+    
+    // Keyboard controls
+    document.addEventListener('keydown', (e) => {
+      if (!e.repeat && keyMap[e.key.toLowerCase()]) {
+        const note = keyMap[e.key.toLowerCase()];
+        const octave = ['z', 'y', 'x', 'u', 'c', 'v', 'i', 'b', 'o', 'n', 'p', 'm', ','].includes(e.key.toLowerCase()) ? baseOctave + 1 : baseOctave;
+        playNote(note, octave);
+      }
+    });
+    
+    document.addEventListener('keyup', (e) => {
+      if (keyMap[e.key.toLowerCase()]) {
+        const note = keyMap[e.key.toLowerCase()];
+        const octave = ['z', 'y', 'x', 'u', 'c', 'v', 'i', 'b', 'o', 'n', 'p', 'm', ','].includes(e.key.toLowerCase()) ? baseOctave + 1 : baseOctave;
+        stopNote(note, octave);
+      }
+    });
+
   
-  document.addEventListener('keyup', (e) => {
-    if (keyMap[e.key.toLowerCase()]) {
-      const note = keyMap[e.key.toLowerCase()];
-      const octave = ['k', 'o', 'l', 'p', ';', "'"].includes(e.key.toLowerCase()) ? baseOctave + 1 : baseOctave;
-      stopNote(note, octave);
-    }
-  });
   
   // Start audio context on user interaction
   document.body.addEventListener('click', () => {
@@ -301,5 +302,6 @@
     }
   }
 </script>
+<h4>NBM - Escola de Música - 2024/  E-mail: nbmescolademusica@gmail.com</h4>
 </body>
 </html>
