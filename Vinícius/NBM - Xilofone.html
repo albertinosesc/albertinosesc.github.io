@@ -1,0 +1,395 @@
+<html><head><base href="https://websim.examples/xylophone-white-keys-with-numbers/" />
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NBM - Xilofone</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    min-height: 100vh;
+    margin: 0;
+    background-color: #f0f0f0;
+    padding: 20px;
+    overflow-x: hidden;
+  }
+  
+  #xylophone-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 60vh;
+    overflow: auto;
+    margin-bottom: 20px;
+  }
+  
+  #xylophone {
+    display: flex;
+    justify-content: center;
+    gap: 5px;
+    padding: 20px;
+    background-color: #8B4513;
+    border-radius: 10px;
+    box-shadow: 0 0 20px rgba(0,0,0,0.3);
+    flex-wrap: wrap;
+    transition: transform 0.3s ease;
+  }
+  
+  .bar {
+    width: 40px;
+    border-radius: 5px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 0;
+    font-weight: bold;
+    cursor: pointer;
+    transition: transform 0.1s, box-shadow 0.1s;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    position: relative;
+  }
+  
+  .bar:active, .bar.active {
+    transform: translateY(5px);
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+  }
+  
+  .bar-label {
+    font-size: 12px;
+    color: #ffffff;
+    text-align: center;
+    width: 100%;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.7);
+  }
+  
+  .key-label {
+    font-size: 14px;
+    color: #ffffff;
+    background-color: rgba(0, 0, 0, 0.5);
+    padding: 2px 5px;
+    border-radius: 3px;
+    margin-top: -5px;
+  }
+  
+  .bar.marked {
+    filter: brightness(70%);
+  }
+
+  
+  h4{
+  font-style: italic; /* Deixa o texto em itálico */
+  text-decoration: underline; /* Sublinha o texto */
+}
+  #controls {
+    margin-top: 20px;
+    display: flex;
+    gap: 20px;
+    align-items: center;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  
+  label {
+    font-weight: bold;
+  }
+  
+  input[type="range"] {
+    width: 200px;
+  }
+  
+  select {
+    padding: 5px;
+    font-size: 16px;
+  }
+
+  #keyboard-guide {
+    margin-top: 20px;
+    text-align: center;
+    font-size: 14px;
+    color: #666;
+  }
+
+  .checkbox-container {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+
+  #mark-note-btn {
+    padding: 10px 20px;
+    font-size: 16px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+  }
+
+  #mark-note-btn:hover {
+    background-color: #45a049;
+  }
+
+  #mark-note-btn.active {
+    background-color: #f44336;
+  }
+
+  #size-control {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  #size-control button {
+    font-size: 18px;
+    width: 30px;
+    height: 30px;
+    border: none;
+    background-color: #4CAF50;
+    color: white;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: background-color 0.3s;
+  }
+
+  #size-control button:hover {
+    background-color: #45a049;
+  }
+
+  #size-value {
+    font-weight: bold;
+    min-width: 40px;
+    text-align: center;
+  }
+ 
+</style>
+</head>
+<body>
+  <h1>NBM - Xilofone</h1>
+  <div id="xylophone-container">
+    <div id="xylophone"></div>
+  </div>
+  <div id="controls">
+    <label for="volume">Volume:</label>
+    <input type="range" id="volume" min="0" max="1" step="0.1" value="0.5">
+    <label for="octave">Oitava Base:</label>
+    <select id="octave">
+      <option value="2">2</option>
+      <option value="3">3</option>
+      <option value="4" selected>4</option>
+      <option value="5">5</option>
+      <option value="6">6</option>
+    </select>
+    <label for="visual-mode">Modo Visual:</label>
+    <select id="visual-mode">
+      <option value="notes">Notas</option>
+      <option value="letters">Letras</option>
+      <option value="numbers">Números</option>
+      <option value="colors">Cores</option>
+      <option value="all">Todas as opções</option>
+    </select>
+    <button id="mark-note-btn">Marcar Nota</button>
+    <div id="size-control">
+      <label for="size-control">Tamanho:</label>
+      <button id="decrease-size">-</button>
+      <span id="size-value">100%</span>
+      <button id="increase-size">+</button>
+    </div>
+  </div>
+  <div id="keyboard-guide">
+    Use as teclas do seu teclado para tocar o xilofone: A-O ou 1-9 (+ 0 para a 10ª nota)
+  </div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.min.js"></script>
+<script>
+  const xylophone = document.getElementById('xylophone');
+  const xylophoneContainer = document.getElementById('xylophone-container');
+  const volumeControl = document.getElementById('volume');
+  const octaveControl = document.getElementById('octave');
+  const visualModeControl = document.getElementById('visual-mode');
+  const markNoteBtn = document.getElementById('mark-note-btn');
+  const decreaseSizeBtn = document.getElementById('decrease-size');
+  const increaseSizeBtn = document.getElementById('increase-size');
+  const sizeValueSpan = document.getElementById('size-value');
+  
+  const notes = ['C', 'D', 'E', 'F', 'G', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'A', 'B', 'C'];
+  const colors = [
+    '#FF0000', '#FFA500', '#FFFF00', '#00FF00', '#0000FF', '#4B0082', '#8B00FF',
+    '#FF0000', '#FFA500', '#FFFF00', '#00FF00', '#0000FF', '#4B0082', '#8B00FF', '#FF0000'
+  ];
+  
+  const synth = new Tone.Synth({
+    oscillator: { type: 'sine' },
+    envelope: { attack: 0.001, decay: 0.1, sustain: 0.1, release: 1 }
+  }).toDestination();
+  
+  let baseOctave = 4;
+  let isMarkingNote = false;
+  let currentSize = 1;
+  
+  const keyMap = {
+    'a': 0, 's': 1, 'd': 2, 'f': 3, 'g': 4, 'h': 5, 'j': 6, 'k': 7, 'l': 8, 
+    'z': 9, 'x': 10, 'c': 11, 'v': 12, 'b': 13, 'n': 14,
+    '1': 0, '2': 1, '3': 2, '4': 3, '5': 4, '6': 5, '7': 6, '8': 7, '9': 8, '0': 9,
+    'q': 10, 'w': 11, 'e': 12, 'r': 13, 't': 14
+  };
+
+  function createBar(note, octave, index) {
+    const bar = document.createElement('div');
+    bar.className = 'bar';
+    bar.dataset.note = note;
+    bar.dataset.octave = octave;
+    bar.dataset.index = index;
+    bar.style.height = `${230 - index * 8}px`;
+    bar.style.backgroundColor = colors[index];
+    
+    const keyLabel = document.createElement('div');
+    keyLabel.className = 'key-label';
+    keyLabel.textContent = getKeyLabel(index);
+    bar.appendChild(keyLabel);
+    
+    const noteLabel = document.createElement('div');
+    noteLabel.className = 'bar-label';
+    bar.appendChild(noteLabel);
+    
+    bar.addEventListener('mousedown', () => playNote(note, octave));
+    bar.addEventListener('mouseup', () => stopNote(note, octave));
+    bar.addEventListener('mouseleave', () => stopNote(note, octave));
+    bar.addEventListener('click', () => toggleMarkNote(bar));
+    
+    return bar;
+  }
+
+  function getKeyLabel(index) {
+    const letterKey = Object.keys(keyMap).find(key => keyMap[key] === index && key.length === 1);
+    const numberKey = index < 9 ? (index + 1).toString() : (index === 9 ? '0' : '');
+    return `${letterKey.toUpperCase()}/${numberKey}`;
+  }
+  
+  function rebuildXylophone() {
+    xylophone.innerHTML = '';
+    notes.forEach((note, index) => {
+      const octave = baseOctave + Math.floor(index / 7);
+      xylophone.appendChild(createBar(note, octave, index));
+    });
+    updateVisualMode();
+    updateXylophoneSize();
+  }
+  
+  rebuildXylophone();
+  
+  function playNote(note, octave) {
+    const fullNote = `${note}${octave}`;
+    synth.triggerAttackRelease(fullNote, '8n');
+    const bar = document.querySelector(`[data-note="${note}"][data-octave="${octave}"]`);
+    if (bar) {
+      bar.classList.add('active');
+      setTimeout(() => bar.classList.remove('active'), 100);
+    }
+  }
+  
+  function stopNote(note, octave) {
+    const bar = document.querySelector(`[data-note="${note}"][data-octave="${octave}"]`);
+    if (bar) bar.classList.remove('active');
+  }
+  
+  volumeControl.addEventListener('input', (e) => {
+    synth.volume.value = Tone.gainToDb(parseFloat(e.target.value));
+  });
+  
+  octaveControl.addEventListener('change', (e) => {
+    baseOctave = parseInt(e.target.value);
+    rebuildXylophone();
+  });
+  
+  visualModeControl.addEventListener('change', updateVisualMode);
+  
+  function updateVisualMode() {
+    const mode = visualModeControl.value;
+    document.querySelectorAll('.bar').forEach((bar, index) => {
+      const noteLabel = bar.querySelector('.bar-label');
+      const note = bar.dataset.note;
+      const octave = bar.dataset.octave;
+      
+      let labelText = '';
+      switch (mode) {
+        case 'notes':
+          labelText = `${note}${octave}`;
+          break;
+        case 'letters':
+          labelText = String.fromCharCode(65 + index);
+          break;
+        case 'numbers':
+          labelText = (index + 1).toString();
+          break;
+        case 'colors':
+          labelText = '';
+          break;
+        case 'all':
+          labelText = `${note}${octave}\n${String.fromCharCode(65 + index)}\n${index + 1}`;
+          break;
+      }
+      noteLabel.textContent = labelText;
+      noteLabel.style.display = mode === 'colors' ? 'none' : 'block';
+      bar.style.backgroundColor = colors[index];
+    });
+  }
+  
+  // Keyboard controls
+  document.addEventListener('keydown', (e) => {
+    if (!e.repeat && keyMap.hasOwnProperty(e.key.toLowerCase())) {
+      const index = keyMap[e.key.toLowerCase()];
+      const note = notes[index];
+      const octave = baseOctave + Math.floor(index / 7);
+      playNote(note, octave);
+    }
+  });
+  
+  // Start audio context on user interaction
+  document.body.addEventListener('click', () => {
+    Tone.start();
+  });
+
+  // Mark note functionality
+  markNoteBtn.addEventListener('click', () => {
+    isMarkingNote = !isMarkingNote;
+    markNoteBtn.classList.toggle('active');
+    markNoteBtn.textContent = isMarkingNote ? 'Cancelar Marcação' : 'Marcar Nota';
+  });
+
+  function toggleMarkNote(bar) {
+    if (isMarkingNote) {
+      bar.classList.toggle('marked');
+    }
+  }
+
+  // Size control functionality
+  function updateXylophoneSize() {
+    xylophone.style.transform = `scale(${currentSize})`;
+    sizeValueSpan.textContent = `${Math.round(currentSize * 100)}%`;
+  }
+
+  decreaseSizeBtn.addEventListener('click', () => {
+    if (currentSize > 0.5) {
+      currentSize = Math.max(0.5, currentSize - 0.1);
+      updateXylophoneSize();
+    }
+  });
+
+  increaseSizeBtn.addEventListener('click', () => {
+    if (currentSize < 2) {
+      currentSize = Math.min(2, currentSize + 0.1);
+      updateXylophoneSize();
+    }
+  });
+
+  // Initial visual mode update
+  updateVisualMode();
+</script>
+<h4>NBM - Escola de Música - 2024/   Email: nbmescolademusica@gmail.com</h4>
+</body>
+</html>
