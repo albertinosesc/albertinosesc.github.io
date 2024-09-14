@@ -6,7 +6,7 @@
     <script src="../dist/abcjs-basic.js" type="text/javascript"></script>
 </head>
 <body onload="load()">
-     <textarea id="abc-input" rows="10" cols="50">
+    <textarea id="abc-input" rows="10" cols="50">
 
     </textarea>
     <div id="paper"></div>
@@ -176,34 +176,5 @@
             }
         }
     </script>
-     
-     <script>
-         async function buscarPalavra() {
-             const url = 'https://api.allorigins.win/get?url=' + encodeURIComponent('https://docs.google.com/spreadsheets/d/e/2PACX-1vRSOWSvpSXQixj1767k6SttH5SnGOZ3TaLeJ8dNMid4VtjdUM68TBn_T_qrV_EFJUiYavns9nvcgjxj/pub?output=csv');
-             try {
-                 const response = await fetch(url);
-                 if (!response.ok) {
-                     throw new Error('Erro ao buscar dados');
-                 }
-                 const data = await response.json();
-                 const csvData = atob(data.contents.split(',')[1]); // Decodificar base64
-                 const linhas = csvData.split('\n');
-                 const busca = document.getElementById('busca').value.toLowerCase();
-                 let resultado = '';
- 
-                 for (let linha of linhas) {
-                     if (linha.toLowerCase().includes(busca)) {
-                         resultado = linha;
-                         break;
-                     }
-                 }
- 
-                 document.getElementById('resultado').value = resultado || 'Nenhum resultado encontrado';
-             } catch (error) {
-                 console.error('Erro:', error);
-                 document.getElementById('resultado').value = 'Erro ao buscar dados';
-             }
-         }
-     </script>
 </body>
 </html>
