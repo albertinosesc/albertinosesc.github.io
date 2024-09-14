@@ -8,7 +8,7 @@
 <body onload="load()">
    <input type="text" id="busca" placeholder="Digite o código">
    <button onclick="buscarPalavra()">Buscar</button>
-   <textarea id="abc-input" rows="10" cols="50"></textarea>
+   <textarea id="resultado" rows="10" cols="50"></textarea>
         <script>
         async function buscarPalavra() {
             const url = 'https://api.allorigins.win/get?url=' + encodeURIComponent('https://docs.google.com/spreadsheets/d/e/2PACX-1vRSOWSvpSXQixj1767k6SttH5SnGOZ3TaLeJ8dNMid4VtjdUM68TBn_T_qrV_EFJUiYavns9nvcgjxj/pub?output=csv');
