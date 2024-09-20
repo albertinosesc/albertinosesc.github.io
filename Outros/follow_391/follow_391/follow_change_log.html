@@ -1,0 +1,149 @@
+<!DOCTYPE HTML><html><head><meta charset="utf-8"></head>
+<body><pre>2024-04-04
+
+	* Revision: 391
+	- allow for an initial title svg without music
+
+2024-02-19
+
+	* Revision: 390
+	- display an error dialog when the audio file fails to load
+	- after dismissing this error dialog, normal operation without audio resumes
+
+2024-02-18
+
+	* Revision: 389
+	- allow break on space in label of menu items
+	- compile scripts updated to python3
+
+2024-02-17
+
+	* Revision: 388
+	- changed the document order of the menu items such that tabbing through the
+	items follows a logical order
+	- the menu CSS now uses flex display for two elements in a row (in stead of
+	float:right)
+	- some code changes to reflect changed names in the html
+
+2024-02-16
+
+	* Revision: 387
+	- nettere behandeling van toetsaanslag voor menukoppen
+	- kleine rand boven menukoppen voor de focusmarkering in firefox
+
+2024-02-15
+
+	* Revision: 386
+	- initial-scale bug
+	- new URL-parameters dbx= and key= for the new dropbox URL's
+	- standard playback behaviour implemented for arrowkeys and space bar
+	- keyboard navigation (tab, space, enter) through menu's
+
+2023-02-27
+
+	* Revision: 385
+	- detect repeat jump when searching for a note near the click position
+	- better placement of loop marks when switching check mode (chkmod)
+	- better placement of the cursor when switching check mode
+
+2023-02-20
+
+	* Revision: 384
+	- bug: the default syncElm should have a property "checked" set to true
+	- include selector "#adv" in handling the advanced menu checkbox
+
+2023-02-17
+
+	* Revision: 383
+	- re-install the speaker icon in the menu bar which not only mutes but also
+	removes sync data and recomputes score tempo. It also stops playback and
+	moves the cursor to the last start position
+	- a second mute symbol before the volume slider in the audio menu. This button
+	only mutes audio.
+
+2023-02-16
+
+	* Revision: 381
+	- removed opt.audOn (mute) option
+	- added opt.syncon option (default true). When false the synchronization data
+	is not used and the score tempos are re-computed (and playback halts).
+	- added an (advanced) checkbox: "Use sync data" that sets the sycon option
+	- the audio volume slider also has a mute button to the left, which, when
+	activated, sets the volume to zero. When the volume is zeroed with the
+	volume slider, the mute button is also activated (for iOS). The mute button
+	remembers the volume before mute and resets that volume when deactivated.
+	- removed global variable "latency", and corrected a related bug
+	- audio speed correction is only applied when opt.syncon is true.
+
+2023-02-14
+
+	* Revision: 380
+	- new audio menu added
+	- moved several controls from the menu bar to the audio menu
+	- new volume slider for the audio element (does not work on iOS)
+	- removed URL parameter "ctrls" becaude player controls are no longer needed
+	to change the volume of the audio element.
+	- changed the microphone switch into a chekbox in the audio menu
+
+2022-11-29
+
+	* Revision: 377
+	- default value of opt.temp is the empty string to enable manual tempo
+	changes when no preload is used.
+	- set the audio playback rate after audio is completely loaded
+	- update the cursor speed (kwartTempo) when audio is manually switched on/off
+
+2022-11-25
+
+	* Revision: 376
+	- separate variables to remember speed changes with and without audio
+	- preload tempo takes precedence over score tempo (if present)
+	- audio tempo map takes precedence over score tempo
+	- preload tempo scales audio tempo map
+
+2022-11-22
+
+	* Revision: 375
+	- do not correct playback timing relative to the audio when audio is muted
+
+2022-11-03
+
+	* Revision: 374
+	- bug: failed to recognize a local file as a preload when abc_arr is
+	imported with javascript import statement.
+
+2022-09-15
+
+	* Revision: 373
+	- avoid irregularity in line cursor movement with multiple grace notes
+
+2022-08-29
+
+	* Revision: 372
+	- had to change the handling of tuplets after a second repeat, because the
+	internal representation of abc2svg changed.
+	- uploaded a new version of abc2svg
+
+2022-07-08
+
+	* Revision: 371
+	- (microphone) convert detected pitches to MIDI messages. Previously pitches
+	were only checked directly (checkMidi).
+	- (microphone) only generate a new note-on message when the previous note has
+	been completed with a note-off message. Previously, multiple note-on
+	messages could occur during decay (mostly false octaves)
+
+2022-06-14
+
+	* Revision: 370
+	- new option "echo" corresponding to the menu checkbox "MIDI echo"
+	- new URL parameter "noecho" to set option echo:false
+
+2022-06-13
+
+	* Revision: 369
+	- always record skipped notes in playback mode so that they also show up
+	when option "show marks" is checked at the end of a performance. Previously
+	recording skipped notes was only done while "show marks" was enabled.
+
+</pre></body></html>
